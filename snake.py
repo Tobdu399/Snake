@@ -1,4 +1,4 @@
-import pygame, random, pathlib, time
+import pygame, random, pathlib
 
 width = 600
 height = 450
