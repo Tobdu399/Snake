@@ -4,7 +4,6 @@ width = 600
 height = 450
 rect = 15
 
-font = "times new roman"
 path = pathlib.Path(__file__).resolve().parent
 
 gameover = False
@@ -29,8 +28,9 @@ clock = pygame.time.Clock()
 display = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Snake")
 
-background = pygame.image.load(str(path) + "/Pictures/background.jpg")
+background = pygame.image.load(str(path) + "/lib/background.jpg")
 background = pygame.transform.scale(background, (width, height))
+font = str(path) + "/lib/font.ttf"
 
 red = pygame.Color(255, 0, 0)
 green = pygame.Color("green")
@@ -38,6 +38,7 @@ white = pygame.Color(255, 255, 255)
 grey = pygame.Color(50, 50, 50)
 yellow = pygame.Color("yellow")
 black = pygame.Color(0, 0, 0)
+background_color = pygame.Color(0, 20, 0)
 
 class Snake:
     def __init__(self):
@@ -93,7 +94,7 @@ class Food:
     
     def show(self):
         if self.isEaten == False and self.x != None and self.y != None:
-            pygame.draw.rect(display, red, (self.x*rect, self.y*rect, rect, rect))
+            pygame.draw.ellipse(display, red, (self.x*rect, self.y*rect, rect, rect))
         else:
             self.new()
 
@@ -103,7 +104,7 @@ class Food:
         self.isEaten = False
 
 def show_fps(surface, font_size, visible, color, xy):
-    fps_font = pygame.font.SysFont(font, font_size)
+    fps_font = pygame.font.Font(font, font_size)
     fps = fps_font.render(str(int(clock.get_fps())), visible, color)
     surface.blit(fps, (xy[0], xy[1]))
 
@@ -117,12 +118,12 @@ def select_difficulty():
     # Background Image
     display.blit(background, (0, 0))
 
-    header_font = pygame.font.SysFont(font, 60)
+    header_font = pygame.font.Font(font, 60)
     header = header_font.render("Select Difficulty", True, white)
     header_rect = header.get_rect()
-    header_rect.midtop = (int(width/2), int(height/4))
+    header_rect.midtop = (int(width/2), int(height/5))
 
-    dif_font = pygame.font.SysFont(font, 30)
+    dif_font = pygame.font.Font(font, 25)
     for dif in difficulties:
         if cursor % len(difficulties) == list(difficulties.keys()).index(dif):
             dif_option = dif_font.render(dif, True, green)
@@ -141,17 +142,17 @@ def game_over():
     display.blit(background, (0, 0))
     difficulty = None
     
-    header_font = pygame.font.SysFont(font, 60)
+    header_font = pygame.font.Font(font, 60)
     header = header_font.render("Game Over!", True, white)
     header_rect = header.get_rect()
-    header_rect.midtop = (int(width/2), int(height/4))
+    header_rect.midtop = (int(width/2), int(height/5))
     
-    scr_font = pygame.font.SysFont(font, 25)
+    scr_font = pygame.font.Font(font, 20)
     scr = scr_font.render(f"Score: {score}", True, white)
     scr_rect = scr.get_rect()
     scr_rect.midtop = (int(width/2), int(height/4) + 45) 
     
-    opt_font = pygame.font.SysFont(font, 30)
+    opt_font = pygame.font.Font(font, 25)
     for opt in go_options:
         if cursor % len(go_options) == go_options.index(opt):
             go_option = opt_font.render(opt, True, green)
@@ -183,7 +184,7 @@ food = Food()
 
 # Game loop
 while True:
-    display.fill(black)
+    display.fill(background_color)
 
     if not gameover:
         if difficulty == None:
