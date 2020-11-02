@@ -39,6 +39,7 @@ grey = pygame.Color(50, 50, 50)
 yellow = pygame.Color("yellow")
 black = pygame.Color(0, 0, 0)
 background_color = pygame.Color(0, 20, 0)
+purple = pygame.Color("purple")
 
 class Snake:
     def __init__(self):
@@ -74,11 +75,17 @@ class Snake:
         global score
         
         self.tail.insert(0, (self.x, self.y))
+
         if food.x == self.x and food.y == self.y:
             food.isEaten = True
             score += 1
+        elif badfood.x == self.x and badfood.y == self.y:
+            badfood.isEaten = True
+            self.tail = self.tail[:-2]
+            if score > 0:
+                score -= 1
         else:
-            self.tail.pop()
+            self.tail = self.tail[:-1]
 
     def move(self):
         if self.direction == "right": self.x += 1
@@ -99,9 +106,32 @@ class Food:
             self.new()
 
     def new(self):
-        self.x = random.randint(0, int(width/rect - 1))
-        self.y = random.randint(0, int(height/rect - 1))
+        while True:
+            self.x = random.randint(0, int(width/rect - 1))
+            self.y = random.randint(0, int(height/rect - 1))
+            if self.x != badfood.x and self.y != badfood.y and badfood.isEaten == False:
+                self.isEaten = False
+                break
+
+class BadFood:
+    def __init__(self):
+        self.x = None
+        self.y = None
         self.isEaten = False
+    
+    def show(self):
+        if self.isEaten == False and self.x != None and self.y != None:
+            pygame.draw.ellipse(display, purple, (self.x*rect, self.y*rect, rect, rect))
+        else:
+            self.new()
+
+    def new(self):
+        while True:
+            self.x = random.randint(0, int(width/rect - 1))
+            self.y = random.randint(0, int(height/rect - 1))
+            if self.x != food.x and self.y != food.y and food.isEaten == False:
+                self.isEaten = False
+                break
 
 def show_fps(surface, font_size, visible, color, xy):
     fps_font = pygame.font.Font(font, font_size)
@@ -168,19 +198,23 @@ def game_over():
 def replay():
     global difficulty
     global gameover
+    global score
 
     difficulty = None
     gameover = False
     snake.x = 0
     snake.y = 0
+    score = 0
     snake.direction = "right"
     snake.tail.clear()
     food.isEaten = True
+    badfood.isEaten = True
 
 
 
 snake = Snake()
 food = Food()
+badfood = BadFood()
 
 # Game loop
 while True:
@@ -191,6 +225,7 @@ while True:
             select_difficulty()
         else:
             food.show()
+            badfood.show()
             snake.show()
             draw_grid(display, rect, grey)
     else:
